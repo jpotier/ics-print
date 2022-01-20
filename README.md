@@ -4,7 +4,7 @@ Add it to your home-configuration and set up your mailcap to refer to ics-print.
 
 ``` nix
 {
-  inputs.ics-print.url = "github:asd";
+  inputs.ics-print.url = "github:MasseR/ics-print";
   outputs = { self, nixpkgs, home-manager, ... } @ inputs: {
     homeConfigurations = {
       "name@system" = home-manager.lib.homeManagerConfiguration {

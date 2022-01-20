@@ -37,10 +37,6 @@
             stylish-haskell
             ghcid
             hls
-
-            sqlite-interactive
-
-            hp.graphmod
           ];
         };
       }

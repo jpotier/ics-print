@@ -20,7 +20,7 @@
       in
       rec {
 
-        packages = { inherit (hp) ics-print; };
+        packages.ics-print = pkgs.haskell.lib.justStaticExecutables hp.ics-print;
 
         defaultPackage = packages.ics-print;
 

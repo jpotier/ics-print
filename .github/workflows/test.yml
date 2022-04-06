@@ -13,5 +13,4 @@ jobs:
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
             system-features = nixos-test benchmark big-parallel kvm
       - run: nix build
-        if: ${{ github.ref == 'refs/head/main' }}
 

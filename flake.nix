@@ -4,20 +4,15 @@
   inputs = {
     nixpkgs = { url = "github:NixOS/nixpkgs/nixos-unstable"; };
     flake-utils.url = "github:numtide/flake-utils";
-    easy-hls = {
-      url = "github:jkachmar/easy-hls-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, easy-hls }:
+  outputs = { self, nixpkgs, flake-utils  }:
     flake-utils.lib.eachSystem ["x86_64-linux" "x86_64-darwin"] ( system:
       let
         pkgs = import nixpkgs { inherit system; };
         hp = pkgs.haskellPackages.extend (self: super: {
           ics-print = self.callPackage ./. {};
         });
-        hls = easy-hls.defaultPackage.${system};
       in
       rec {
 
@@ -37,7 +32,7 @@
             hp.hlint
             stylish-haskell
             ghcid
-            hls
+            hp.haskell-language-server
           ];
         };
       }

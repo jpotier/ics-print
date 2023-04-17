@@ -3,27 +3,19 @@
 module MyLib (icsPrint) where
 
 import Data.ByteString.Builder
-       (Builder, byteString, hPutBuilder, lazyByteString)
-import qualified Data.ByteString.Char8 as BC
+       (hPutBuilder)
 import Data.Default (def)
-import Data.Foldable (for_, traverse_)
-import qualified Data.Text.Lazy.Encoding as TLE
 import System.IO (stdout)
 import Text.ICalendar
 
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import Data.Time
-       ( Day
-       , LocalTime
-       , TimeZone
-       , defaultTimeLocale
-       , formatTime
-       , getTimeZone
-       , iso8601DateFormat
+       ( getTimeZone
        , utcToLocalTime
        )
 import Doc
+import Data.Time.Format.ISO8601 (iso8601Format, formatShow, ISO8601)
 
 formatVCalendar :: [VCalendar] -> IO Doc -- Needs IO for timezone :/
 formatVCalendar = foldMap formatCal
@@ -36,27 +28,21 @@ formatVCalendar = foldMap formatCal
       pure (maybe mempty formatDescription (veDescription ev) <> line <> line) <>
       pure ("Attendees: " <> nest 2 (foldMap (\a -> line <> formatAttendee a) (veAttendee ev)))
     -- This is the cause for IO :/
-    formatLocalTime :: LocalTime -> Doc
-    formatLocalTime = text . T.pack . formatTime defaultTimeLocale (iso8601DateFormat (Just "%H:%M:%S"))
-    formatDay :: Day -> Doc
-    formatDay = text . T.pack . formatTime defaultTimeLocale (iso8601DateFormat Nothing)
+    formatISO8601 :: ISO8601 t => t -> Doc
+    formatISO8601 = text . T.pack . formatShow iso8601Format
     formatTStamp :: DTStart -> IO Doc
     formatTStamp = \case
-      DTStartDateTime (FloatingDateTime time) _ -> pure $ formatLocalTime time
-      DTStartDateTime (ZonedDateTime time _) _ -> pure $ formatLocalTime time
+      DTStartDateTime (FloatingDateTime time) _ -> pure $ formatISO8601 time
+      DTStartDateTime (ZonedDateTime time _) _ -> pure $ formatISO8601 time
       -- -- This requires IO :/
       -- -- I can't take the tz early because the timezone depends on the actual
       -- -- time which I only know at the time of rendering
-      DTStartDateTime (UTCDateTime time) _ -> fmap (\tz -> formatLocalTime (utcToLocalTime tz time)) (getTimeZone time)
-      DTStartDate (Date day) _ -> pure $ formatDay day
+      DTStartDateTime (UTCDateTime time) _ -> fmap (\tz -> formatISO8601 (utcToLocalTime tz time)) (getTimeZone time)
+      DTStartDate (Date day) _ -> pure $ formatISO8601 day
     formatDescription :: Description -> Doc
     formatDescription = text . TL.toStrict . descriptionValue
     formatAttendee :: Attendee -> Doc
     formatAttendee = maybe mempty (prefix "- " . text . TL.toStrict) . attendeeCN
-    prefix :: Doc -> Doc -> Doc
-    prefix p x = p <> x
-    bshow :: Show a => a -> Doc
-    bshow = text . T.pack . show
 
 icsPrint :: FilePath -> IO ()
 icsPrint path =

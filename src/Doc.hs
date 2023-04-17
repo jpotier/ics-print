@@ -14,7 +14,6 @@ module Doc
   where
 
 import Data.ByteString.Builder (Builder, byteString)
-import qualified Data.ByteString.Char8 as BC
 import Data.Foldable (fold)
 import Data.String
 import Data.Text (Text)

@@ -25,7 +25,7 @@
 
         devShell = hp.shellFor {
           packages = h: [h.ics-print];
-          withHoogle = true;
+          withHoogle = false;
           buildInputs = with pkgs; [
             entr
             cabal-install

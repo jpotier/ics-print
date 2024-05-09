@@ -7,7 +7,7 @@
   };
 
   outputs = { self, nixpkgs, flake-utils  }:
-    flake-utils.lib.eachSystem ["x86_64-linux" "x86_64-darwin" "arm64-linux"] ( system:
+    flake-utils.lib.eachSystem ["x86_64-linux" "x86_64-darwin" "aarch64-linux"] ( system:
       let
         pkgs = import nixpkgs { inherit system; };
         hp = pkgs.haskellPackages.extend (self: super: {
